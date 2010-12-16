@@ -1,0 +1,11 @@
+/* Lua source code style sheet */
+SPAN.comment			{ color:#005500; } 			/* -- till the end of line */
+SPAN.blockcomment		{ color:#005500; }			/* --[[ contents ]] */
+SPAN.keyword			{ color:#001177; }			/* if, not, for, then ... etc */
+SPAN.string				{ color:#880000; }			/* string literal */
+SPAN.character			{ color:#880000; }			/* string literal */
+SPAN.operator			{ color:#000000; }			/* operator +,- but not or, not, and */
+SPAN.misc				{ color:#000000; }			/* tokens that are not operators [], {}, , . .. ... */
+SPAN.num				{ color:#880000; }			/* numeric literal */
+SPAN.number				{ color:#880000; }			/* numeric literal */
+SPAN.library			{ color:#000088; }			/* a library function, like table.insert */

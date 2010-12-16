@@ -1,0 +1,83 @@
+INTRODUCTION:
+
+A coverage analysis toolbox for Lua written in C++ for performance, 
+both in speed and memory.  Includes:
+  - Lua module to measuring coverage
+  - Python scripts for generating xml output reports
+  - XSL scripts for pretty HTML reports with optional graphs (via 
+    google chart)
+
+HOW TO USE:
+
+Turn luacov/luacov.cpp into a Lua module compatible with your local 
+Lua executable OR compile it into your application that embeds Lua.
+
+You can require the lcovtools module using:
+
+	local lcovtools = require("lcovtools")
+
+The module contains the following methods:
+
+	lcovtools.start()		Start recording coverage data
+	lcovtools.stop()		Stop recording coverage data
+	lcovtools.reset()		Clear any recorded coverage data
+	lcovtools.dump()		
+	
+	Dump coverage data (in XML format) to somewhere.  If you provide 
+	no parameter to this function it dumps to stdout. Alternatively,
+	you may provide a userdata or table with a 'write' method that
+	takes a single string parameter containing the data to be written.
+	
+	lcovtools.gethook()		
+	
+	Your program may already set a Lua debug hook, in which case, this
+	function will return a userdata that contains a function pointer 
+	to the lcovtools hook that you can chain onto your own hook.
+	
+	lcovtools.getstats()
+	
+	Returns the number of files with data and the total memory used 
+	to store all the recorded coverage data (up till this point).
+
+ABOUT COVERAGE:
+
+Code coverage is a useful metric for measuring the effectiveness of 
+your automated tests.  One of the goals for an automated test is to
+cover all possible paths through the subject code.  A coverage tool
+can help by providing a global metric (lines covered / total lines)
+as well as a visual report that highlights the lines in the subject
+code not covered.
+
+ABOUT LUA COVERAGE:
+
+Lua provides a debug hook that can be called for every line of code
+executed by the VM.  In the hook you can retrieve the filename and
+line number which is then added to the global "lines covered" list.
+
+This is not a linked list, but is a bit vector per file where each
+bit marks a single line in a file as visited.  Unfortunately, there
+is no way to ask Lua for the total lines in a file, so lcovtools
+will have to grow these bit vectors from time to time (this probably
+impacts performance more than any other factor).
+
+Another challenge is to remove false-positives from the result, for
+example, a single 'end' on a line (to close a function or loop) is
+never 'executed' by the VM so is never present in the coverage 
+results.  When it comes time to generate a report, all these lines
+are marked as 'not covered' - but really, they are.
+
+To solve this problem you need a list of valid lines and you can get
+this from the lua compiler itself by parsing the output of the debug 
+listing.  The python script "lcovtools-extractlines.py" does just 
+this by invoking the Lua compiling for all sources on the command
+line and using some regex's to extract the relevant data.
+
+SOME EXTRAS:
+
+You can pass the file containing valid lines with the coverage data
+to another script called "lcovtools-makereport.py" and this will 
+generate an XML file that contains a summary of the coverage 
+results, and the per file view showing what lines were not covered
+(with syntax higlighting!).
+
+
